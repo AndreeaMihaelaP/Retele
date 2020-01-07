@@ -1,10 +1,3 @@
-/* servTCPIt.c - Exemplu de server TCP iterativ
-   Asteapta un nume de la clienti; intoarce clientului sirul
-   "Hello nume".
-   
-   Autor: Lenuta Alboaie  <adria@infoiasi.ro> (c)2009
-*/
-
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -13,20 +6,33 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <signal.h>
+#include <pthread.h>
 
 /* portul folosit */
-#define PORT 2024
+#define PORT 2908
 
 /* codul de eroare returnat de anumite apeluri */
 extern int errno;
+
+typedef struct thData{
+	int idThread; //id-ul thread-ului tinut in evidenta de acest program
+	int cl; //descriptorul intors de accept
+}thData;
+
+static void *treat(void *); /* functia executata de fiecare thread ce realizeaza comunicarea cu clientii */
+void raspunde(void *);
 
 int main ()
 {
   struct sockaddr_in server;	// structura folosita de server
   struct sockaddr_in from;	
-  char msg[100];		//mesajul primit de la client 
-  char msgrasp[100]=" ";        //mesaj de raspuns pentru client
-  int sd;			//descriptorul de socket 
+  int nr;		//mesajul primit de trimis la client 
+  int sd;		//descriptorul de socket 
+  int pid;
+  pthread_t th[100];    //Identificatorii thread-urilor care se vor crea
+	int i=0;
+  
 
   /* crearea unui socket */
   if ((sd = socket (AF_INET, SOCK_STREAM, 0)) == -1)
@@ -34,7 +40,10 @@ int main ()
       perror ("[server]Eroare la socket().\n");
       return errno;
     }
-
+  /* utilizarea optiunii SO_REUSEADDR */
+  int on=1;
+  setsockopt(sd,SOL_SOCKET,SO_REUSEADDR,&on,sizeof(on));
+  
   /* pregatirea structurilor de date */
   bzero (&server, sizeof (server));
   bzero (&from, sizeof (from));
@@ -55,63 +64,83 @@ int main ()
     }
 
   /* punem serverul sa asculte daca vin clienti sa se conecteze */
-  if (listen (sd, 5) == -1)
+  if (listen (sd, 2) == -1)
     {
       perror ("[server]Eroare la listen().\n");
       return errno;
     }
-
-  /* servim in mod iterativ clientii... */
+  /* servim in mod concurent clientii...folosind thread-uri */
   while (1)
     {
       int client;
+      thData * td; //parametru functia executata de thread     
       int length = sizeof (from);
 
       printf ("[server]Asteptam la portul %d...\n",PORT);
       fflush (stdout);
 
+      // client= malloc(sizeof(int));
       /* acceptam un client (stare blocanta pina la realizarea conexiunii) */
-      client = accept (sd, (struct sockaddr *) &from, &length);
-
-      /* eroare la acceptarea conexiunii de la un client */
-      if (client < 0)
+      if ( (client = accept (sd, (struct sockaddr *) &from, &length)) < 0)
 	{
 	  perror ("[server]Eroare la accept().\n");
 	  continue;
 	}
-
-      /* s-a realizat conexiunea, se astepta mesajul */
-      bzero (msg, 100);
-      printf ("[server]Asteptam mesajul...\n");
-      fflush (stdout);
-      
-      /* citirea mesajului */
-      if (read (client, msg, 100) <= 0)
-	{
-	  perror ("[server]Eroare la read() de la client.\n");
-	  close (client);	/* inchidem conexiunea cu clientul */
-	  continue;		/* continuam sa ascultam */
-	}
 	
-      printf ("[server]Mesajul a fost receptionat...%s\n", msg);
-      
-      /*pregatim mesajul de raspuns */
-      bzero(msgrasp,100);
-      strcat(msgrasp,"Hello ");
-      strcat(msgrasp,msg);
-      
-      printf("[server]Trimitem mesajul inapoi...%s\n",msgrasp);
-      
-      
-      /* returnam mesajul clientului */
-      if (write (client, msgrasp, 100) <= 0)
-	{
-	  perror ("[server]Eroare la write() catre client.\n");
-	  continue;		/* continuam sa ascultam */
-	}
-      else
-	printf ("[server]Mesajul a fost trasmis cu succes.\n");
-      /* am terminat cu acest client, inchidem conexiunea */
-      close (client);
-    }				/* while */
-}				/* main */
+        /* s-a realizat conexiunea, se astepta mesajul */
+    
+	// int idThread; //id-ul threadului
+	// int cl; //descriptorul intors de accept
+
+	td=(struct thData*)malloc(sizeof(struct thData));	
+	td->idThread=i++;
+	td->cl=client;
+
+	pthread_create(&th[i], NULL, &treat, td);	      
+				
+	}//while    
+};				
+static void *treat(void * arg)
+{		
+		struct thData tdL; 
+		tdL= *((struct thData*)arg);	
+		printf ("[thread]- %d - Asteptam mesajul...\n", tdL.idThread);
+		fflush (stdout);		 
+		pthread_detach(pthread_self());		
+		raspunde((struct thData*)arg);
+		/* am terminat cu acest client, inchidem conexiunea */
+		close ((intptr_t)arg);
+		return(NULL);	
+  		
+};
+
+
+void raspunde(void *arg)
+{
+        int nr, i=0;
+	struct thData tdL; 
+	tdL= *((struct thData*)arg);
+	if (read (tdL.cl, &nr,sizeof(int)) <= 0)
+			{
+			  printf("[Thread %d]\n",tdL.idThread);
+			  perror ("Eroare la read() de la client.\n");
+			
+			}
+	
+	printf ("[Thread %d]Mesajul a fost receptionat...%d\n",tdL.idThread, nr);
+		      
+		      /*pregatim mesajul de raspuns */
+		      nr++;      
+	printf("[Thread %d]Trimitem mesajul inapoi...%d\n",tdL.idThread, nr);
+		      
+		      
+		      /* returnam mesajul clientului */
+	 if (write (tdL.cl, &nr, sizeof(int)) <= 0)
+		{
+		 printf("[Thread %d] ",tdL.idThread);
+		 perror ("[Thread]Eroare la write() catre client.\n");
+		}
+	else
+		printf ("[Thread %d]Mesajul a fost trasmis cu succes.\n",tdL.idThread);	
+
+}
