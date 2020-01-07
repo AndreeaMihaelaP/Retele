@@ -11,9 +11,44 @@
 
 /* portul folosit */
 #define PORT 2908
+#define NR_MAX_CLIENTI 3
 
 /* codul de eroare returnat de anumite apeluri */
 extern int errno;
+
+int valori[] = { 1,2,3,4,1,1,1,1,2,3 };
+int counter = 0;
+
+void displayValues(int valori[], int size) {
+  for(int item = 0; item < size; ++item){
+    printf("%d\n", valori[item]);
+  }
+}
+
+int chooseFavoriteFood(int arr[], int n, int k) { 
+  // Iterate though input array, for every element 
+    // arr[i], increment arr[arr[i]%k] by k 
+    for (int i = 0; i< n; i++) 
+        arr[arr[i]%k] += k; 
+  
+    // Find index of the maximum repeating element 
+    int max = arr[0], result = 0; 
+    for (int i = 1; i < n; i++) 
+    { 
+        if (arr[i] > max) 
+        { 
+            max = arr[i]; 
+            result = i; 
+        } 
+    } 
+  
+    /* Uncomment this code to get the original array back 
+       for (int i = 0; i< n; i++) 
+          arr[i] = arr[i]%k; */
+  
+    // Return index of the maximum element 
+    return result; 
+}
 
 typedef struct thData{
 	int idThread; //id-ul thread-ului tinut in evidenta de acest program
@@ -32,7 +67,11 @@ int main ()
   int pid;
   pthread_t th[100];    //Identificatorii thread-urilor care se vor crea
 	int i=0;
-  
+  int nrMaxClienti = 0;
+
+  int rezult = chooseFavoriteFood(valori, sizeof(valori)/sizeof(valori[0]), 5 );
+
+  printf("the result %d\n", rezult);
 
   /* crearea unui socket */
   if ((sd = socket (AF_INET, SOCK_STREAM, 0)) == -1)
@@ -70,8 +109,7 @@ int main ()
       return errno;
     }
   /* servim in mod concurent clientii...folosind thread-uri */
-  while (1)
-    {
+  while(nrMaxClienti <= NR_MAX_CLIENTI) {
       int client;
       thData * td; //parametru functia executata de thread     
       int length = sizeof (from);
@@ -82,23 +120,23 @@ int main ()
       // client= malloc(sizeof(int));
       /* acceptam un client (stare blocanta pina la realizarea conexiunii) */
       if ( (client = accept (sd, (struct sockaddr *) &from, &length)) < 0)
-	{
-	  perror ("[server]Eroare la accept().\n");
-	  continue;
-	}
-	
+      {
+        perror ("[server]Eroare la accept().\n");
+        continue;
+      }
+      
         /* s-a realizat conexiunea, se astepta mesajul */
     
-	// int idThread; //id-ul threadului
-	// int cl; //descriptorul intors de accept
+      // int idThread; //id-ul threadului
+      // int cl; //descriptorul intors de accept
 
-	td=(struct thData*)malloc(sizeof(struct thData));	
-	td->idThread=i++;
-	td->cl=client;
+      td=(struct thData*)malloc(sizeof(struct thData));	
+      td->idThread=i++;
+      td->cl=client;
 
-	pthread_create(&th[i], NULL, &treat, td);	      
-				
-	}//while    
+      pthread_create(&th[i], NULL, &treat, td);	      
+      nrMaxClienti++;
+	}
 };				
 static void *treat(void * arg)
 {		
@@ -115,32 +153,36 @@ static void *treat(void * arg)
 };
 
 
-void raspunde(void *arg)
-{
-        int nr, i=0;
-	struct thData tdL; 
-	tdL= *((struct thData*)arg);
-	if (read (tdL.cl, &nr,sizeof(int)) <= 0)
-			{
-			  printf("[Thread %d]\n",tdL.idThread);
-			  perror ("Eroare la read() de la client.\n");
-			
-			}
-	
-	printf ("[Thread %d]Mesajul a fost receptionat...%d\n",tdL.idThread, nr);
-		      
-		      /*pregatim mesajul de raspuns */
-		      nr++;      
-	printf("[Thread %d]Trimitem mesajul inapoi...%d\n",tdL.idThread, nr);
-		      
-		      
-		      /* returnam mesajul clientului */
-	 if (write (tdL.cl, &nr, sizeof(int)) <= 0)
-		{
-		 printf("[Thread %d] ",tdL.idThread);
-		 perror ("[Thread]Eroare la write() catre client.\n");
-		}
-	else
-		printf ("[Thread %d]Mesajul a fost trasmis cu succes.\n",tdL.idThread);	
+void raspunde(void *arg) {
+    int nr, i=0;
+    struct thData tdL; 
+    tdL= *((struct thData*)arg);
+    if (read (tdL.cl, &nr,sizeof(int)) <= 0)
+        {
+          printf("[Thread %d]\n",tdL.idThread);
+          perror ("Eroare la read() de la client.\n");
+        
+        }
+    
+    printf ("[Thread %d]Mesajul a fost receptionat...%d\n",tdL.idThread, nr);
+
+    valori[counter++] = nr;
+    
+    for ( int i = 0; i < sizeof(valori) ; i++ ){
+      printf("valori si bla %d %d \n", i, valori[i]);
+    };
+
+    /*pregatim mesajul de raspuns */     
+    printf("[Thread %d]Trimitem mesajul inapoi...%d\n",tdL.idThread, nr);
+            
+            
+            /* returnam mesajul clientului */
+    if (write (tdL.cl, &nr, sizeof(int)) <= 0)
+      {
+      printf("[Thread %d] ",tdL.idThread);
+      perror ("[Thread]Eroare la write() catre client.\n");
+      }
+    else
+      printf ("[Thread %d]Mesajul a fost trasmis cu succes.\n",tdL.idThread);	
 
 }
