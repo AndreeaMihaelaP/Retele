@@ -49,9 +49,9 @@ int main (int argc, char *argv[]) {
 
 
   // Shopper
-  int selected;
-  int response;
-  char name[50], pass[50];
+  int operatie;
+  int ok;
+  char nume[50], parola[50];
 
   printf("\n \
      Bine ati venit la Shopper \n \
@@ -60,56 +60,59 @@ int main (int argc, char *argv[]) {
   1.Login \n");
 
   // Login
-  scanf("%d", &selected);
+  scanf("%d", &operatie);
 
-  if (selected == 1) {
+  // if (operatie == 1) {
 
-    // Trimitem la server operatia
-    write(sd, &selected, sizeof(int));
-
-    printf("User :"); scanf("%s", name);
-    printf("Parola :"); scanf("%s", pass);
-
-    //printf("%s %s", nume, parola);
-    fflush(stdout);
-
-    write(sd, name,  sizeof(char));
-    write(sd, pass,  sizeof(int));
-    read(sd, &response, sizeof(int));
-
-    if (response == 1) {
-      printf("Logat cu succes.\n\n\n");
-      printf("\n");
-    } else {
-      printf("Mai incearca.");
-      printf("\n");
-      return 0;
-    }
-  }
-
-  // if (operatie == 2) {
   //   write(sd, &operatie, 4);
   //   printf("User :"); scanf("%s", nume);
   //   printf("Parola :"); scanf("%s", parola);
+  //   //printf("%s %s", nume, parola);
   //   int len1 = strlen(nume);
   //   int len2 = strlen(parola);
+  //   //printf("%d %d", len1, len2);
   //   fflush(stdout);
   //   write(sd, &len1, 4);
   //   write(sd, nume, len1);
   //   write(sd, &len2, 4);
   //   write(sd, parola, len2);
+
   //   int ok;
   //   read(sd, &ok, 4);
 
-  //   if (ok == 0){
-  //     printf("Inregistrat cu succes.\n\n\n");
+  //   if (ok == 1) {
+  //     printf("Logat cu succes.\n\n\n");
   //     printf("\n");
   //   } else {
-  //     printf("Account folosit..");
+  //     printf("Mai incearca.");
   //     printf("\n");
   //     return(0);
   //   }
   // }
+
+  if (operatie == 2) {
+    write(sd, &operatie, 4);
+    printf("User :"); scanf("%s", nume);
+    printf("Parola :"); scanf("%s", parola);
+    int len1 = strlen(nume);
+    int len2 = strlen(parola);
+    fflush(stdout);
+    write(sd, &len1, 4);
+    write(sd, nume, len1);
+    write(sd, &len2, 4);
+    write(sd, parola, len2);
+    int ok;
+    read(sd, &ok, 4);
+
+    if (ok == 0){
+      printf("Inregistrat cu succes.\n\n\n");
+      printf("\n");
+    } else {
+      printf("Account folosit..");
+      printf("\n");
+      return(0);
+    }
+  }
   //   int totSum = 0;
   //   int vector[200];
   //   int g = 1;

@@ -12,6 +12,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <pwd.h>
+#include <sqlite3.h>
 
 
 #define PORT 2908
@@ -27,6 +28,7 @@ typedef struct thData {
 static void *treat(void *); // functia executata de fiecare thread ce realizeaza comunicarea cu clientii
 void raspunde(void *);
 int check(int, const char*);
+int selectUseri(char*, char*);
 
 int main () {
   struct sockaddr_in server;	// structura folosita de server
@@ -96,7 +98,7 @@ static void *treat(void * arg) {
   printf ("[thread]- %d - Asteptam mesajul...\n", tdL.idThread);
   fflush (stdout);
 
-  pthread_detach(pthread_self());
+  pthread_detach(pthread_self());     FILE *fis2 = fopen("useri.txt", "r");
   raspunde((struct thData*)arg);
 
   // am terminat cu acest client, inchidem conexiunea
@@ -107,63 +109,30 @@ static void *treat(void * arg) {
 
 void raspunde(void *arg) {
 
-  int nameLength, passLength;
-  int selected;
-  char name[50], pass[50];
+  int len1, len2;
+  int operatie;
+  char nume[50], parola[50];
 
 	// Thread
 	struct thData tdL;
 	tdL = *((struct thData*)arg);
 
-  read(tdL.cl, &selected, 4);
-  printf("Selected : %d \n", selected);
+  read(tdL.cl, &operatie, sizeof(int));
+  printf("Selected : %d \n", operatie);
 
   // Logare
-  if (selected == 1) {
+  // if (operatie == 1) {
+  //     // int cnt;
+  //     // FILE *fis = fopen("cnt.txt", "r");
+  //     // fscanf(fis, "%d", &cnt);
+  //     // fclose(fis);
 
-    // Citim numele utilizatorului
-    read(tdL.cl, name, sizeof(char));
-    nameLength = strlen(name);
-    name[nameLength] = '\0';
-
-    // Citim parola
-    read(tdL.cl, pass, sizeof(char));
-    passLength = strlen(pass);
-    pass[passLength] = '\0';
-
-      printf("\n");
-      printf("%s %s \n", name, pass);
-
-
-      FILE *fis2 = fopen("useri.txt", "r");
-      int response = 0;
-
-			// // Cautam utilizatorul
-      // for (int i = 0; i < cnt; i++){
-      //     char one[50], two[50];
-      //     fscanf(fis2, "%s", one);
-      //     fscanf(fis2, "%s", two);
-
-      //     if(strcmp(one, nume) == 0 && strcmp(two, parola) == 0){
-      //       ok = 1;
-      //     }
-      // }
-
-			// Vedem daca s-a logat sau nu
-      write(tdL.cl, &response, sizeof(int));
-  }
-
-  // // Sign up - Aceeasi logica ca la Login pentru prima parte
-  // if (operatie == 2) {
-  //     int cnt;
-  //     FILE *fis = fopen("cnt.txt", "r");
-  //     fscanf(fis, "%d", &cnt);
-  //     fclose(fis);
-
+	// 		// Citim numele utilizatorului
   //     read(tdL.cl, &len1, 4);
   //     read(tdL.cl, nume, len1);
   //     nume[len1] = '\0';
 
+	// 		// Citim parola
   //     read(tdL.cl, &len2, 4);
   //     read(tdL.cl, parola, len2);
   //     parola[len2] = '\0';
@@ -173,35 +142,45 @@ void raspunde(void *arg) {
   //     printf("\n");
   //     printf("%d %d", len1, len2);
   //     printf("\n");
-  //     printf("CNT: %d", cnt);
-  //     printf("\n");
-  //     FILE *fis2 = fopen("useri.txt", "r");
-  //     int ok = 0;
 
-	// 		// Cautam sa vedem daca utilizatorul se afla in baza de date
-  //     for(int i = 0; i < cnt; i++){
-  //         char one[50], two[50];
-  //         fscanf(fis2, "%s", one);
-  //         fscanf(fis2, "%s", two);
 
-  //         if(strcmp(one, nume) == 0 && strcmp(two, parola) == 0){
-  //           ok = 1;
-  //         }
-  //     }
-
+      // int ok = selectUseri(nume, parola);
+      // printf("Rezultat %d\n", ok);
+      
+	// 		// Vedem daca s-a logat sau nu
   //     write(tdL.cl, &ok, 4);
-
-	// 		// Daca nu am gasit utilizatorul, il bagam in baza de date
-  //     if (ok == 0){
-  //         fis = fopen("cnt.txt", "w");
-  //         cnt++;
-  //         fprintf(fis, "%d", cnt);
-  //         fclose(fis);
-  //         fis2 = fopen("useri.txt", "a+");
-  //         fprintf(fis2, "%s %s\n", nume, parola);
-  //         fclose(fis2);
-  //     }
   // }
+
+
+  // Sign up - Aceeasi logica ca la Login pentru prima parte
+  if (operatie == 2) {
+      read(tdL.cl, &len1, 4);
+      read(tdL.cl, nume, len1);
+      nume[len1] = '\0';
+
+      read(tdL.cl, &len2, 4);
+      read(tdL.cl, parola, len2);
+      parola[len2] = '\0';
+
+      printf("\n");
+      printf("%s %s", nume, parola);
+      printf("\n");
+      printf("%d %d", len1, len2);
+      printf("\n");
+
+      FILE *fis2 = fopen("useri.txt", "r");
+      int ok = 0;
+
+	    int ok = selectUseri(nume, parola);
+      printf("Rezultat %d\n", ok);
+
+      write(tdL.cl, &ok, 4);
+
+			// Daca nu am gasit utilizatorul, il bagam in baza de date
+      if (ok == 0){
+         inserareUser(nume, parola);
+      }
+  }
 
   // int g = 1;
 
@@ -259,4 +238,53 @@ int check(int exp, const char *msg){
     exit(1);
   }
   return exp;
+}
+
+int selectUseri(char* name, char* pass) {
+    sqlite3 *db;
+    char *err_msg = 0;
+    sqlite3_stmt *res;
+    
+    int rc = sqlite3_open("shopper.db", &db);
+    
+    if (rc != SQLITE_OK) {
+        
+        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        
+        return -1;
+    }
+    
+    char *sql = "SELECT id, nume, parola FROM Useri WHERE nume = ? and parola = ?";
+        
+    rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
+    
+    if (rc == SQLITE_OK) {
+
+      sqlite3_bind_text(res, 1, name, -1, SQLITE_STATIC);
+      sqlite3_bind_text(res, 2, pass, -1, SQLITE_STATIC);
+
+    } else {
+        
+        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+    }
+    
+    int step = sqlite3_step(res);
+    
+    if (step == SQLITE_ROW) {
+
+        printf("%s: ", sqlite3_column_text(res, 0));
+        printf("%s ", sqlite3_column_text(res, 1));
+        printf("%s \n", sqlite3_column_text(res, 2));
+        printf("intra aici\n");
+        
+    } else {
+      printf("nu are rand\n");
+      return 0;
+    }
+
+    sqlite3_finalize(res);
+    sqlite3_close(db);
+    
+    return 1;
 }
