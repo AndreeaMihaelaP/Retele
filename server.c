@@ -29,6 +29,7 @@ static void *treat(void *); // functia executata de fiecare thread ce realizeaza
 void raspunde(void *);
 int check(int, const char*);
 int selectUseri(char*, char*);
+void insertUser( char* , char*);
 
 int main () {
   struct sockaddr_in server;	// structura folosita de server
@@ -168,18 +169,18 @@ void raspunde(void *arg) {
       printf("%d %d", len1, len2);
       printf("\n");
 
-      FILE *fis2 = fopen("useri.txt", "r");
-      int ok = 0;
 
 	    int ok = selectUseri(nume, parola);
       printf("Rezultat %d\n", ok);
 
-      write(tdL.cl, &ok, 4);
-
 			// Daca nu am gasit utilizatorul, il bagam in baza de date
       if (ok == 0){
-         inserareUser(nume, parola);
+        printf("Inainte ok cand e 0 \n");
+        insertUser(nume, parola);
+        printf("Dupa ok cand e 0 \n");
       }
+
+      write(tdL.cl, &ok, 4);
   }
 
   // int g = 1;
@@ -251,11 +252,9 @@ int selectUseri(char* name, char* pass) {
         
         fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
-        
-        return -1;
     }
     
-    char *sql = "SELECT id, nume, parola FROM Useri WHERE nume = ? and parola = ?";
+    char *sql = "SELECT nume, parola FROM Useri WHERE nume = ? and parola = ?";
         
     rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
     
@@ -273,9 +272,9 @@ int selectUseri(char* name, char* pass) {
     
     if (step == SQLITE_ROW) {
 
-        printf("%s: ", sqlite3_column_text(res, 0));
-        printf("%s ", sqlite3_column_text(res, 1));
-        printf("%s \n", sqlite3_column_text(res, 2));
+        // printf("%s: ", sqlite3_column_text(res, 0));
+        printf("%s ", sqlite3_column_text(res, 0));
+        printf("%s \n", sqlite3_column_text(res, 1));
         printf("intra aici\n");
         
     } else {
@@ -287,4 +286,43 @@ int selectUseri(char* name, char* pass) {
     sqlite3_close(db);
     
     return 1;
+}
+
+void insertUser( char* nume , char* parola ){
+
+  sqlite3 *db ;
+  char *err_msg = 0;
+    
+  int rc = sqlite3_open("shopper.db", &db);
+    
+  if (rc != SQLITE_OK) {
+    
+    fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+    sqlite3_close(db);
+  }
+  
+  char sql[200] =  "INSERT INTO Useri (nume, parola) VALUES ( '" ;
+    strcat(sql , nume );
+    strcat(sql , "','" );
+    strcat(sql , parola );
+    strcat(sql , "');" );
+
+  printf("query %s \n", sql);
+
+  rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    
+  if (rc != SQLITE_OK ) {
+      
+      fprintf(stderr, "SQL error: %s\n", err_msg);
+      
+      sqlite3_free(err_msg);        
+      sqlite3_close(db);
+        
+  } else {
+
+    printf("S-a inserat \n");
+  }
+    
+    sqlite3_close(db);
+   
 }

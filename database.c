@@ -19,11 +19,11 @@ int main(void) {
     }
     
     char *sql = "DROP TABLE IF EXISTS Useri;" 
-                "CREATE TABLE Useri(Id INT, NUME TEXT, PAROLA TEXT);" 
-                "INSERT INTO Useri VALUES(1, 'andreea', 'andreea');" 
-                "INSERT INTO Useri VALUES(2, 'vali', 'bala');" 
-                "INSERT INTO Useri VALUES(3, 'cristi', 'cristi');" 
-                "INSERT INTO Useri VALUES(4, 'sanda', 'sanda');" ;
+                "CREATE TABLE Useri(NUME TEXT, PAROLA TEXT);" 
+                "INSERT INTO Useri VALUES('andreea', 'andreea');" 
+                "INSERT INTO Useri VALUES('vali', 'bala');" 
+                "INSERT INTO Useri VALUES('cristi', 'cristi');" 
+                "INSERT INTO Useri VALUES('sanda', 'sanda');" ;
 
     rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
     
