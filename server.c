@@ -20,6 +20,8 @@
 // codul de eroare returnat de anumite apeluri
 extern int errno;
 
+
+
 typedef struct thData {
 	int idThread; // id-ul thread-ului tinut in evidenta de acest program
 	int cl; // descriptorul intors de accept
@@ -30,6 +32,8 @@ void raspunde(void *);
 int check(int, const char*);
 int selectUseri(char*, char*);
 void insertUser( char* , char*);
+char* selectImbracaminte();
+
 
 int main () {
   struct sockaddr_in server;	// structura folosita de server
@@ -121,44 +125,19 @@ void raspunde(void *arg) {
   read(tdL.cl, &operatie, sizeof(int));
   printf("Selected : %d \n", operatie);
 
-  // Logare
-  // if (operatie == 1) {
-  //     // int cnt;
-  //     // FILE *fis = fopen("cnt.txt", "r");
-  //     // fscanf(fis, "%d", &cnt);
-  //     // fclose(fis);
+  //Logare
+  if (operatie == 1) {
+      // int cnt;
+      // FILE *fis = fopen("cnt.txt", "r");
+      // fscanf(fis, "%d", &cnt);
+      // fclose(fis);
 
-	// 		// Citim numele utilizatorului
-  //     read(tdL.cl, &len1, 4);
-  //     read(tdL.cl, nume, len1);
-  //     nume[len1] = '\0';
-
-	// 		// Citim parola
-  //     read(tdL.cl, &len2, 4);
-  //     read(tdL.cl, parola, len2);
-  //     parola[len2] = '\0';
-
-  //     printf("\n");
-  //     printf("%s %s", nume, parola);
-  //     printf("\n");
-  //     printf("%d %d", len1, len2);
-  //     printf("\n");
-
-
-      // int ok = selectUseri(nume, parola);
-      // printf("Rezultat %d\n", ok);
-      
-	// 		// Vedem daca s-a logat sau nu
-  //     write(tdL.cl, &ok, 4);
-  // }
-
-
-  // Sign up - Aceeasi logica ca la Login pentru prima parte
-  if (operatie == 2) {
+			// Citim numele utilizatorului
       read(tdL.cl, &len1, 4);
       read(tdL.cl, nume, len1);
       nume[len1] = '\0';
 
+			// Citim parola
       read(tdL.cl, &len2, 4);
       read(tdL.cl, parola, len2);
       parola[len2] = '\0';
@@ -170,66 +149,164 @@ void raspunde(void *arg) {
       printf("\n");
 
 
-	    int ok = selectUseri(nume, parola);
+      int ok = selectUseri(nume, parola);
       printf("Rezultat %d\n", ok);
-
-			// Daca nu am gasit utilizatorul, il bagam in baza de date
-      if (ok == 0){
-        printf("Inainte ok cand e 0 \n");
-        insertUser(nume, parola);
-        printf("Dupa ok cand e 0 \n");
-      }
-
+      
+			// Vedem daca s-a logat sau nu
       write(tdL.cl, &ok, 4);
   }
 
-  // int g = 1;
 
-  // while (g) {
-  //   g = 0;
-  //   char categorii[5000];
-  //   memset(categorii, 0, sizeof(categorii));
+  // // Sign up - Aceeasi logica ca la Login pentru prima parte
+  // if (operatie == 2) {
+  //     read(tdL.cl, &len1, 4);
+  //     read(tdL.cl, nume, len1);
+  //     nume[len1] = '\0';
 
-	// 	// Afisam categoriile
-  //   strcat(categorii, "1.Imbracaminte.\n");
-  //   strcat(categorii, "2.Incaltaminte.\n");
-  //   strcat(categorii, "3.Telefonie.\n");
-  //   int len3 = strlen(categorii);
-  //   write(tdL.cl, &len3, 4);
-  //   write(tdL.cl, categorii, len3);
-  //   int cat;
-  //   read(tdL.cl, &cat, 4);
-  //   printf("Categorie : %d\n", cat);
-  //   FILE *fis3;
+  //     read(tdL.cl, &len2, 4);
+  //     read(tdL.cl, parola, len2);
+  //     parola[len2] = '\0';
 
-  //   if (cat == 1) {
-  //     fis3 = fopen("imbracaminte.txt", "r");
-	// 	} else if(cat == 2) {
-  //     fis3 = fopen("incaltaminte.txt", "r");
-	// 	} else {
-  //     fis3 = fopen("telefonie.txt", "r");
-	// 	}
+  //     printf("\n");
+  //     printf("%s %s", nume, parola);
+  //     printf("\n");
+  //     printf("%d %d", len1, len2);
+  //     printf("\n");
 
-  //   int n;
-  //   char p[50][50];
-  //   char c[50][50];
 
-  //   fscanf(fis3, "%d", &n);
-  //   printf("N = %d\n", n);
-  //   for(int i = 0; i < n; i++){
-  //       fscanf(fis3, "%s %s",p[i], c[i]);
-  //   }
-  //   fclose(fis3);
+	//     int ok = selectUseri(nume, parola);
+  //     printf("Rezultat %d\n", ok);
 
-	// 	// Afisam produsele (p, c vectorii care contin produsele)
-  //   write(tdL.cl, &n, 4);
-  //   printf("\n");
-  //   write(tdL.cl, p, 2500);
-  //   printf("\n");
-  //   write(tdL.cl, c, 2500);
-  //   printf("\n");
-  //   read(tdL.cl, &g, 4);
+	// 		// Daca nu am gasit utilizatorul, il bagam in baza de date
+  //     if (ok == 0){
+  //       printf("Inainte ok cand e 0 \n");
+  //       insertUser(nume, parola);
+  //       printf("Dupa ok cand e 0 \n");
+  //     }
+
+  //     write(tdL.cl, &ok, 4);
   // }
+
+  int g = 1;
+
+  while (g) {
+    g = 0;
+    char categorii[5000];
+    memset(categorii, 0, sizeof(categorii));
+
+		// Afisam categoriile
+    strcat(categorii, "1.Imbracaminte.\n");
+    strcat(categorii, "2.Incaltaminte.\n");
+
+
+    int len3 = strlen(categorii);
+
+    write(tdL.cl, &len3, 4);
+    write(tdL.cl, categorii, len3);
+
+    int cat;
+    read(tdL.cl, &cat, 4);
+    printf("Categorie : %d\n", cat);
+
+    // FILE *fis3;
+
+    // if (cat == 1) {
+    //   fis3 = fopen("imbracaminte.txt", "r");
+		// } else if(cat == 2) {
+    //   fis3 = fopen("incaltaminte.txt", "r");
+		// } 
+
+  
+
+
+    int n = 0;
+    char *s[50];
+    while (n < 50)
+    {
+        s[n]= (char *)malloc(1000*sizeof(char)); n++;
+    }
+
+    if (cat == 1) {
+
+    sqlite3 *db;
+    char *err_msg = 0;
+    sqlite3_stmt *res;
+    
+    int rc = sqlite3_open("shopper.db", &db);
+    
+    if (rc != SQLITE_OK) {
+        
+        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+    }
+    
+    char *sql = "SELECT * FROM Imbracaminte";
+        
+    rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
+    
+    if (rc == SQLITE_OK) {
+
+      printf("s-a facut sql \n");
+
+    } else {
+        
+        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+    }
+    
+    // int step = sqlite3_step(res);
+    // int n = 0;
+    // char *s[50];
+    // while (n < 50)
+    // {
+    //     s[n]= (char *)malloc(1000*sizeof(char)); n++;
+    // }
+    n = 0;
+
+    while(sqlite3_step(res) == SQLITE_ROW) {
+
+        // printf("%s: ", sqlite3_column_text(res, 0));
+        // printf("%s ", sqlite3_column_text(res, 0));
+        // printf("%s \n", sqlite3_column_text(res, 1));
+
+        strcpy(s[n], sqlite3_column_text(res, 0) );
+        strcat(s[n] , " ");
+        strcat(s[n] , sqlite3_column_text(res, 1));
+        strcat(s[n] , "\n");
+
+        n++;
+    }   
+
+    // // puts(s);
+    // write(tdL.cl, s, 2500);
+
+    // sqlite3_finalize(res);
+    // sqlite3_close(db);
+    
+    // for(int i = 0; i < 5; i++) {
+    //   printf("BAaaa%s \n", s[i]);
+    // }
+
+		} else if(cat == 2) {
+      // selectIcaltaminte();
+		} 
+
+   
+    // fscanf(fis3, "%d", &n);
+    // printf("N = %d\n", n);
+    // for(int i = 0; i < n; i++){
+    //     fscanf(fis3, "%s %s",p[i], c[i]);
+    // }
+    // fclose(fis3);
+
+		// Afisam produsele (p, c vectorii care contin produsele)
+    // write(tdL.cl, &n, 4);
+    // printf("\n");
+      write(tdL.cl, s, 2500);
+      printf("\n");
+    // write(tdL.cl, c, 2500);
+    // printf("\n");
+    read(tdL.cl, &g, 4);
+  }
 }
 
 int check(int exp, const char *msg){
@@ -326,3 +403,6 @@ void insertUser( char* nume , char* parola ){
     sqlite3_close(db);
    
 }
+
+
+

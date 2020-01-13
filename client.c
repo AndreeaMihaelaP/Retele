@@ -57,125 +57,136 @@ int main (int argc, char *argv[]) {
      Bine ati venit la Shopper \n \
   >---------------------------------< \n \
   Alegeti una din varianta alegand o cifra\n\n\
-  1.Login \n");
+  1.Login\n \
+  2.Inregistrare \n");
 
   // Login
   scanf("%d", &operatie);
 
-  // if (operatie == 1) {
+  if (operatie == 1) {
 
-  //   write(sd, &operatie, 4);
-  //   printf("User :"); scanf("%s", nume);
-  //   printf("Parola :"); scanf("%s", parola);
-  //   //printf("%s %s", nume, parola);
-  //   int len1 = strlen(nume);
-  //   int len2 = strlen(parola);
-  //   //printf("%d %d", len1, len2);
-  //   fflush(stdout);
-  //   write(sd, &len1, 4);
-  //   write(sd, nume, len1);
-  //   write(sd, &len2, 4);
-  //   write(sd, parola, len2);
-
-  //   int ok;
-  //   read(sd, &ok, 4);
-
-  //   if (ok == 1) {
-  //     printf("Logat cu succes.\n\n\n");
-  //     printf("\n");
-  //   } else {
-  //     printf("Mai incearca.");
-  //     printf("\n");
-  //     return(0);
-  //   }
-  // }
-
-  if (operatie == 2) {
     write(sd, &operatie, 4);
     printf("User :"); scanf("%s", nume);
     printf("Parola :"); scanf("%s", parola);
+    //printf("%s %s", nume, parola);
     int len1 = strlen(nume);
     int len2 = strlen(parola);
+    //printf("%d %d", len1, len2);
     fflush(stdout);
     write(sd, &len1, 4);
     write(sd, nume, len1);
     write(sd, &len2, 4);
     write(sd, parola, len2);
+
     int ok;
     read(sd, &ok, 4);
 
-    if (ok == 0){
-      printf("Inregistrat cu succes.\n\n\n");
+    if (ok == 1) {
+      printf("Logat cu succes.\n\n\n");
       printf("\n");
     } else {
-      printf("Account folosit..");
+      printf("Mai incearca.");
       printf("\n");
       return(0);
     }
   }
-  //   int totSum = 0;
-  //   int vector[200];
-  //   int g = 1;
 
-  //   while(g) {
-  //     g = 0;
-  //     char categorii[5000];
-  //     memset(categorii, 0, sizeof(categorii));
-  //     int len3;
-  //     read(sd, &len3, 4);
-  //     read(sd, categorii, len3);
-  //     printf("%s",categorii);
-  //     printf("\n\n");
-  //     int cat;
-  //     printf("Alege categoria: "); scanf("%d", &cat);
-  //     // Trimitem la server categoria
-  //     write(sd, &cat, 4);
-  //     int n;
-  //     char c[int check(int exp, const char *msg)50][50];
-  //     char p[50][50];
-  //     // Serverul ne intoarce numarul de categorii
-  //     read(sd, &n, 4);
+  // if (operatie == 2) {
+  //   write(sd, &operatie, 4);
+  //   printf("User :"); scanf("%s", nume);
+  //   printf("Parola :"); scanf("%s", parola);
+  //   int len1 = strlen(nume);
+  //   int len2 = strlen(parola);
+  //   fflush(stdout);
+  //   write(sd, &len1, 4);
+  //   write(sd, nume, len1);
+  //   write(sd, &len2, 4);
+  //   write(sd, parola, len2);
+  //   int ok;
+  //   read(sd, &ok, 4);
 
-  //     // Serverul intoarce vectorii cu produsele
-  //     read(sd, p, 2500);
-  //     read(sd, c, 2500);
-  //     printf("N = %d\n\n", n);
+  //   if (ok == 0){
+  //     printf("Inregistrat cu succes.\n\n\n");
+  //     printf("\n");
+  //   } else {
+  //     printf("Account folosit..");
+  //     printf("\n");
+  //     return(0);
+  //   }
+  // }
+    int totSum = 0;
+    int vector[200];
+    int g = 1;
 
-  //     // Iteram peste produse
-  //     for(int i=0;i<n;i++){
-  //         printf("%d. %s -> %s RONI \n", i + 1, p[i], c[i]);
-  //     }
+    while(g) {
+      g = 0;
+      char categorii[5000];
+      memset(categorii, 0, sizeof(categorii));
+      int len3;
 
-  //     // Golim vectorul
-  //     memset(vector, 0, sizeof(vector));
+      read(sd, &len3, 4);
+      read(sd, categorii, len3);
 
-  //     int x = 1;
+      printf("%s",categorii);
+      printf("\n\n");
 
-  //     while(x) {
-  //        printf("Selecteaza item-ul pe care vrei sa il adaugi in cos. Tastezi 0 cand termini. \n");
-  //        scanf("%d", &x);
-  //        vector[x]++;
-  //        printf("A fost adaugat item-ul %d in cos. \n\n", x);
-  //     }
-  //     printf("\n----------------------------------------------\n");
-  //     int sum = 0;
+      int cat;
+      printf("Alege categoria: "); scanf("%d", &cat);
 
-  //     for(int i = 1; i < 50; i++){
-  //       if (vector[i]) {
-  //           sum += atoi(c[i-1]) * vector[i];
-  //           printf("Elementul %d este de %d ori in cos.\n\n", i, vector[i]);
-  //       }
-  //     }
-  //     printf("-----------------------------------------------");
-  //     printf("\nSuma  produselor alese din categoria asta = %d RONI\n\n\n", sum);
-  //     totSum += sum;
-  //     printf("0.Checkout.\n");
-  //     printf("1.Alege produse din alta categorie.\n");
-  //     scanf("%d", &g);
-  //     write(sd, &g, 4);
-  //  }
+      // Trimitem la server categoria
+      write(sd, &cat, 4);
 
-  //   printf("Total spre plata : %d\n", totSum);
+      int n;
+      // char c[50][50];
+      // char p[50][50];
+      char *s[100];
+
+      // Serverul ne intoarce numarul de categorii
+      read(sd, &n, 4);
+
+      // Serverul intoarce vectorii cu produsele
+      read(sd, s, 2500);
+
+
+      // read(sd, s, 2500);
+      // read(sd, c, 2500);
+      // printf("N = %d\n\n", n);
+
+      // Iteram peste produse
+      for(int i=0; i<4; i++){
+          printf("%d. %s RONI \n", i + 1, s[i]);
+      }
+
+      // Golim vectorul
+      // memset(vector, 0, sizeof(vector));
+
+      // int x = 1;
+
+      // while(x) {
+      //    printf("Selecteaza item-ul pe care vrei sa il adaugi in cos. Tastezi 0 cand termini. \n");
+      //    scanf("%d", &x);
+      //    vector[x]++;
+      //    printf("A fost adaugat item-ul %d in cos. \n\n", x);
+      // }
+      // printf("\n----------------------------------------------\n");
+      // int sum = 0;
+
+      // for(int i = 1; i < 50; i++){
+      //   if (vector[i]) {
+      //       sum += atoi(c[i-1]) * vector[i];
+      //       printf("Elementul %d este de %d ori in cos.\n\n", i, vector[i]);
+      //   }
+      // }
+      // printf("-----------------------------------------------");
+      // printf("\nSuma  produselor alese din categoria asta = %d RONI\n\n\n", sum);
+      // totSum += sum;
+      // printf("0.Checkout.\n");
+      // printf("1.Alege produse din alta categorie.\n");
+      // scanf("%d", &g);
+      // write(sd, &g, 4);
+   }
+
+    printf("Total spre plata : %d\n", totSum);
 }
 
 int check(int exp, const char *msg){
