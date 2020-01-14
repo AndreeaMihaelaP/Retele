@@ -115,7 +115,7 @@ int main (int argc, char *argv[]) {
   //   }
   // }
     int totSum = 0;
-    int vector[200];
+    int vector[5];
     int g = 1;
 
     while(g) {
@@ -139,13 +139,15 @@ int main (int argc, char *argv[]) {
       int n;
       // char c[50][50];
       // char p[50][50];
-      char *s[100];
-
+      char produse[200][200];
+      
+       char cost[200][200];
       // Serverul ne intoarce numarul de categorii
-      read(sd, &n, 4);
+      // read(sd, &n, 4);
 
       // Serverul intoarce vectorii cu produsele
-      read(sd, s, 2500);
+      read(sd, produse, sizeof(produse));
+      read(sd, cost, sizeof(cost));
 
 
       // read(sd, s, 2500);
@@ -153,37 +155,38 @@ int main (int argc, char *argv[]) {
       // printf("N = %d\n\n", n);
 
       // Iteram peste produse
-      for(int i=0; i<4; i++){
-          printf("%d. %s RONI \n", i + 1, s[i]);
+      for(int i = 0; i < 4; i++){
+          printf("%d. %s  %sRONI \n", i + 1, produse[i], cost[i]);
       }
 
       // Golim vectorul
-      // memset(vector, 0, sizeof(vector));
+      memset(vector, 0, sizeof(vector));
 
-      // int x = 1;
+      int x = 1;
 
-      // while(x) {
-      //    printf("Selecteaza item-ul pe care vrei sa il adaugi in cos. Tastezi 0 cand termini. \n");
-      //    scanf("%d", &x);
-      //    vector[x]++;
-      //    printf("A fost adaugat item-ul %d in cos. \n\n", x);
-      // }
-      // printf("\n----------------------------------------------\n");
-      // int sum = 0;
+      while(x) {
+         printf("Selecteaza item-ul pe care vrei sa il adaugi in cos. Tastezi 0 cand termini. \n");
+         scanf("%d", &x);
+         vector[x]++;
+         // verifica daca chiar exista pana la opresteeee-l
+         printf("A fost adaugat item-ul %d in cos. \n\n", x);
+      }
+      printf("\n----------------------------------------------\n");
+      int sum = 0;
 
-      // for(int i = 1; i < 50; i++){
-      //   if (vector[i]) {
-      //       sum += atoi(c[i-1]) * vector[i];
-      //       printf("Elementul %d este de %d ori in cos.\n\n", i, vector[i]);
-      //   }
-      // }
-      // printf("-----------------------------------------------");
-      // printf("\nSuma  produselor alese din categoria asta = %d RONI\n\n\n", sum);
-      // totSum += sum;
-      // printf("0.Checkout.\n");
-      // printf("1.Alege produse din alta categorie.\n");
-      // scanf("%d", &g);
-      // write(sd, &g, 4);
+      for(int i = 1; i < 50; i++){
+        if (vector[i]) {
+            sum += atoi(cost[i-1]) * vector[i];
+            printf("Elementul %d este de %d ori in cos.\n\n", i, vector[i]);
+        }
+      }
+      printf("-----------------------------------------------");
+      printf("\nSuma  produselor alese din categoria asta = %d RONI\n\n\n", sum);
+      totSum += sum;
+      printf("0.Checkout.\n");
+      printf("1.Alege produse din alta categorie.\n");
+      scanf("%d", &g);
+      write(sd, &g, 4);
    }
 
     printf("Total spre plata : %d\n", totSum);

@@ -197,7 +197,7 @@ void raspunde(void *arg) {
 		// Afisam categoriile
     strcat(categorii, "1.Imbracaminte.\n");
     strcat(categorii, "2.Incaltaminte.\n");
-
+    strcat(categorii, "3.Mancare.\n");
 
     int len3 = strlen(categorii);
 
@@ -208,26 +208,16 @@ void raspunde(void *arg) {
     read(tdL.cl, &cat, 4);
     printf("Categorie : %d\n", cat);
 
-    // FILE *fis3;
 
-    // if (cat == 1) {
-    //   fis3 = fopen("imbracaminte.txt", "r");
-		// } else if(cat == 2) {
-    //   fis3 = fopen("incaltaminte.txt", "r");
-		// } 
 
+  int n = 0;
+  char produse[200][200];
+
+  char cost[200][200];
+  int m = 0;
+
+  if (cat == 1) {
   
-
-
-    int n = 0;
-    char *s[50];
-    while (n < 50)
-    {
-        s[n]= (char *)malloc(1000*sizeof(char)); n++;
-    }
-
-    if (cat == 1) {
-
     sqlite3 *db;
     char *err_msg = 0;
     sqlite3_stmt *res;
@@ -235,9 +225,9 @@ void raspunde(void *arg) {
     int rc = sqlite3_open("shopper.db", &db);
     
     if (rc != SQLITE_OK) {
-        
-        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
-        sqlite3_close(db);
+      
+      fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+      sqlite3_close(db);
     }
     
     char *sql = "SELECT * FROM Imbracaminte";
@@ -250,46 +240,137 @@ void raspunde(void *arg) {
 
     } else {
         
-        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+      fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
     }
-    
-    // int step = sqlite3_step(res);
-    // int n = 0;
-    // char *s[50];
-    // while (n < 50)
-    // {
-    //     s[n]= (char *)malloc(1000*sizeof(char)); n++;
-    // }
-    n = 0;
 
     while(sqlite3_step(res) == SQLITE_ROW) {
 
         // printf("%s: ", sqlite3_column_text(res, 0));
         // printf("%s ", sqlite3_column_text(res, 0));
         // printf("%s \n", sqlite3_column_text(res, 1));
+        printf("intra intraaa \n");
 
-        strcpy(s[n], sqlite3_column_text(res, 0) );
-        strcat(s[n] , " ");
-        strcat(s[n] , sqlite3_column_text(res, 1));
-        strcat(s[n] , "\n");
-
+        strcpy(produse[n], sqlite3_column_text(res, 0) );
+        strcat(produse[n], "\n");
+        strcat(cost[m], sqlite3_column_text(res, 1));
+        strcat(cost[m], "\n");
+        m++;
         n++;
+
     }   
 
-    // // puts(s);
-    // write(tdL.cl, s, 2500);
-
-    // sqlite3_finalize(res);
-    // sqlite3_close(db);
-    
-    // for(int i = 0; i < 5; i++) {
-    //   printf("BAaaa%s \n", s[i]);
-    // }
-
 		} else if(cat == 2) {
-      // selectIcaltaminte();
-		} 
+      memset(produse, 0, sizeof(produse));
+      memset(cost, 0, sizeof(cost));
+      n = 0;
+      m = 0;
+      sqlite3 *db;
+      char *err_msg = 0;
+      sqlite3_stmt *res;
+      
+      int rc = sqlite3_open("shopper.db", &db);
+      
+      if (rc != SQLITE_OK) {
+        
+        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+      }
+      
+      char *sql = "SELECT * FROM Incaltaminte";
+          
+      rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
+      
+      if (rc == SQLITE_OK) {
 
+        printf("s-a facut sql \n");
+
+      } else {
+          
+        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+      }
+      
+
+      while(sqlite3_step(res) == SQLITE_ROW) {
+
+        // printf("%s: ", sqlite3_column_text(res, 0));
+        // printf("%s ", sqlite3_column_text(res, 0));
+        // printf("%s \n", sqlite3_column_text(res, 1));
+
+        strcpy(produse[n], sqlite3_column_text(res, 0) );
+        strcat(produse[n] , " ");
+        strcat(cost[m] , sqlite3_column_text(res, 1));
+        strcat(cost[m] , "\n");
+
+        n++;
+        m++;
+      } 
+		} else if( cat == 3) {
+      memset(produse, 0, sizeof(produse));
+      memset(cost, 0, sizeof(cost));
+      n = 0;
+      m = 0;
+      sqlite3 *db;
+      char *err_msg = 0;
+      sqlite3_stmt *res;
+      
+      int rc = sqlite3_open("shopper.db", &db);
+      
+      if (rc != SQLITE_OK) {
+        
+        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+      }
+      
+      char *sql = "SELECT * FROM Mancare";
+          
+      rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
+      
+      if (rc == SQLITE_OK) {
+
+        printf("s-a facut sql \n");
+
+      } else {
+          
+        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+      }
+      
+
+      while(sqlite3_step(res) == SQLITE_ROW) {
+
+        // printf("%s: ", sqlite3_column_text(res, 0));
+        // printf("%s ", sqlite3_column_text(res, 0));
+        // printf("%s \n", sqlite3_column_text(res, 1));
+
+        strcpy(produse[n], sqlite3_column_text(res, 0) );
+        strcat(produse[n] , " ");
+        strcat(cost[m] , sqlite3_column_text(res, 1));
+        strcat(cost[m] , "\n");
+
+        n++;
+        m++;
+      } 
+    }
+
+    write(tdL.cl, produse, sizeof(produse));
+    write(tdL.cl, cost, sizeof(cost));
+
+    // printf("rezulta imbra: %s", imbracaminte[0]); 
+
+    for( int i = 0; i < 4; i++) {
+      printf("rezulta imbra: %s", produse[i]);
+    }
+
+     for( int i = 0; i < 4; i++) {
+      printf("rezulta incalta: %s", cost[i]);
+    }
+
+    // char rezultatIncaltaminte[50];
+    // strcpy(rezultatIncaltaminte, incaltaminte);
+
+    // printf("rezulta incaltaminte: %s", rezultatIncaltaminte[1]);
+    // for( int i = 0; i < 4; i++) {
+    //   printf("rezulta incaltaminte: %d", rezultatIncaltaminte[i]);
+    // }
    
     // fscanf(fis3, "%d", &n);
     // printf("N = %d\n", n);
@@ -301,7 +382,6 @@ void raspunde(void *arg) {
 		// Afisam produsele (p, c vectorii care contin produsele)
     // write(tdL.cl, &n, 4);
     // printf("\n");
-      write(tdL.cl, s, 2500);
       printf("\n");
     // write(tdL.cl, c, 2500);
     // printf("\n");

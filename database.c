@@ -11,8 +11,12 @@ int main(void) {
     int rc = sqlite3_open("shopper.db", &db);
     int rcImbracaminte = sqlite3_open("shopper.db", &db);
     int rcIncaltaminte = sqlite3_open("shopper.db", &db);
+    int rcMancare = sqlite3_open("shopper.db", &db);
     
-    if (rc != SQLITE_OK || rcImbracaminte != SQLITE_OK || rcIncaltaminte != SQLITE_OK) {
+    if (rc != SQLITE_OK 
+        || rcImbracaminte != SQLITE_OK 
+        || rcIncaltaminte != SQLITE_OK 
+        || rcMancare != SQLITE_OK ) {
         
         fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
@@ -39,13 +43,25 @@ int main(void) {
                 "INSERT INTO Incaltaminte VALUES('sandale', '80');" 
                 "INSERT INTO Incaltaminte VALUES('adidasi','90');" 
                 "INSERT INTO Incaltaminte VALUES('tenisi', '500');" 
-                "INSERT INTO Incaltaminte VALUES('bocanci', '100');" ;              
+                "INSERT INTO Incaltaminte VALUES('bocanci', '100');" ;    
+
+    
+    char *sqlMancare = "DROP TABLE IF EXISTS Mancare;" 
+                "CREATE TABLE Mancare(MANCARE TEXT, PRET TEXT);" 
+                "INSERT INTO Mancare VALUES('banane', '40');" 
+                "INSERT INTO Mancare VALUES('pizza','20');" 
+                "INSERT INTO Mancare VALUES('salata', '15');" 
+                "INSERT INTO Mancare VALUES('mere', '20');" ;                     
 
     rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
     rcImbracaminte = sqlite3_exec(db, sqlImbracaminte, 0, 0, &err_msg);
     rcIncaltaminte = sqlite3_exec(db, sqlIncaltaminte, 0, 0, &err_msg);
+    rcMancare = sqlite3_exec(db, sqlMancare, 0, 0, &err_msg);
     
-    if (rc != SQLITE_OK  || rcImbracaminte != SQLITE_OK) {
+    if (rc != SQLITE_OK
+        || rcImbracaminte != SQLITE_OK 
+        || rcIncaltaminte != SQLITE_OK 
+        || rcImbracaminte != SQLITE_OK ){
         
         fprintf(stderr, "SQL error: %s\n", err_msg);
         
