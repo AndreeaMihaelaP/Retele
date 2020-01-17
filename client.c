@@ -91,29 +91,29 @@ int main (int argc, char *argv[]) {
     }
   }
 
-  // if (operatie == 2) {
-  //   write(sd, &operatie, 4);
-  //   printf("User :"); scanf("%s", nume);
-  //   printf("Parola :"); scanf("%s", parola);
-  //   int len1 = strlen(nume);
-  //   int len2 = strlen(parola);
-  //   fflush(stdout);
-  //   write(sd, &len1, 4);
-  //   write(sd, nume, len1);
-  //   write(sd, &len2, 4);
-  //   write(sd, parola, len2);
-  //   int ok;
-  //   read(sd, &ok, 4);
+  if (operatie == 2) {
+    write(sd, &operatie, 4);
+    printf("User :"); scanf("%s", nume);
+    printf("Parola :"); scanf("%s", parola);
+    int len1 = strlen(nume);
+    int len2 = strlen(parola);
+    fflush(stdout);
+    write(sd, &len1, 4);
+    write(sd, nume, len1);
+    write(sd, &len2, 4);
+    write(sd, parola, len2);
+    int ok;
+    read(sd, &ok, 4);
 
-  //   if (ok == 0){
-  //     printf("Inregistrat cu succes.\n\n\n");
-  //     printf("\n");
-  //   } else {
-  //     printf("Account folosit..");
-  //     printf("\n");
-  //     return(0);
-  //   }
-  // }
+    if (ok == 0){
+      printf("Inregistrat cu succes.\n\n\n");
+      printf("\n");
+    } else {
+      printf("Account folosit..");
+      printf("\n");
+      return(0);
+    }
+  }
     int totSum = 0;
     int vector[5];
     int g = 1;

@@ -20,6 +20,11 @@
 // codul de eroare returnat de anumite apeluri
 extern int errno;
 
+int n = 0;
+char produse[200][200];
+
+char cost[200][200];
+int m = 0;
 
 
 typedef struct thData {
@@ -32,7 +37,7 @@ void raspunde(void *);
 int check(int, const char*);
 int selectUseri(char*, char*);
 void insertUser( char* , char*);
-char* selectImbracaminte();
+void selectCategorie(char categorie[]);
 
 
 int main () {
@@ -43,12 +48,12 @@ int main () {
   pthread_t th[100]; // Identificatorii thread-urilor care se vor crea
 	int i = 0;
 
-  //crearea unui socket
+  // crearea unui socket
   check (sd = socket (AF_INET, SOCK_STREAM, 0), "[server]Eroare la socket().\n");
 
   // utilizarea optiunii SO_REUSEADDR
   int on = 1;
-  setsockopt(sd,SOL_SOCKET,SO_REUSEADDR,&on,sizeof(on));
+  setsockopt(sd,SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 
   // pregatirea structurilor de date
   bzero (&server, sizeof (server));
@@ -127,10 +132,6 @@ void raspunde(void *arg) {
 
   //Logare
   if (operatie == 1) {
-      // int cnt;
-      // FILE *fis = fopen("cnt.txt", "r");
-      // fscanf(fis, "%d", &cnt);
-      // fclose(fis);
 
 			// Citim numele utilizatorului
       read(tdL.cl, &len1, 4);
@@ -157,41 +158,42 @@ void raspunde(void *arg) {
   }
 
 
-  // // Sign up - Aceeasi logica ca la Login pentru prima parte
-  // if (operatie == 2) {
-  //     read(tdL.cl, &len1, 4);
-  //     read(tdL.cl, nume, len1);
-  //     nume[len1] = '\0';
+  // Sign up - Aceeasi logica ca la Login pentru prima parte
+  if (operatie == 2) {
+      read(tdL.cl, &len1, 4);
+      read(tdL.cl, nume, len1);
+      nume[len1] = '\0';
 
-  //     read(tdL.cl, &len2, 4);
-  //     read(tdL.cl, parola, len2);
-  //     parola[len2] = '\0';
+      read(tdL.cl, &len2, 4);
+      read(tdL.cl, parola, len2);
+      parola[len2] = '\0';
 
-  //     printf("\n");
-  //     printf("%s %s", nume, parola);
-  //     printf("\n");
-  //     printf("%d %d", len1, len2);
-  //     printf("\n");
+      printf("\n");
+      printf("%s %s", nume, parola);
+      printf("\n");
+      printf("%d %d", len1, len2);
+      printf("\n");
 
 
-	//     int ok = selectUseri(nume, parola);
-  //     printf("Rezultat %d\n", ok);
+	    int ok = selectUseri(nume, parola);
+      printf("Rezultat %d\n", ok);
 
-	// 		// Daca nu am gasit utilizatorul, il bagam in baza de date
-  //     if (ok == 0){
-  //       printf("Inainte ok cand e 0 \n");
-  //       insertUser(nume, parola);
-  //       printf("Dupa ok cand e 0 \n");
-  //     }
+			// Daca nu am gasit utilizatorul, il bagam in baza de date
+      if (ok == 0){
+        printf("Inainte ok cand e 0 \n");
+        insertUser(nume, parola);
+        printf("Dupa ok cand e 0 \n");
+      }
 
-  //     write(tdL.cl, &ok, 4);
-  // }
+      write(tdL.cl, &ok, 4);
+  }
 
   int g = 1;
 
   while (g) {
     g = 0;
     char categorii[5000];
+    char categorie[30];
     memset(categorii, 0, sizeof(categorii));
 
 		// Afisam categoriile
@@ -209,147 +211,28 @@ void raspunde(void *arg) {
     printf("Categorie : %d\n", cat);
 
 
-
-  int n = 0;
-  char produse[200][200];
-
-  char cost[200][200];
-  int m = 0;
-
   if (cat == 1) {
-  
-    sqlite3 *db;
-    char *err_msg = 0;
-    sqlite3_stmt *res;
-    
-    int rc = sqlite3_open("shopper.db", &db);
-    
-    if (rc != SQLITE_OK) {
-      
-      fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
-      sqlite3_close(db);
-    }
-    
-    char *sql = "SELECT * FROM Imbracaminte";
-        
-    rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
-    
-    if (rc == SQLITE_OK) {
 
-      printf("s-a facut sql \n");
-
-    } else {
-        
-      fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
-    }
-
-    while(sqlite3_step(res) == SQLITE_ROW) {
-
-        // printf("%s: ", sqlite3_column_text(res, 0));
-        // printf("%s ", sqlite3_column_text(res, 0));
-        // printf("%s \n", sqlite3_column_text(res, 1));
-        printf("intra intraaa \n");
-
-        strcpy(produse[n], sqlite3_column_text(res, 0) );
-        strcat(produse[n], "\n");
-        strcat(cost[m], sqlite3_column_text(res, 1));
-        strcat(cost[m], "\n");
-        m++;
-        n++;
-
-    }   
+    memset(categorie, 0, sizeof(categorie));
+    strcpy(categorie, "Imbracaminte");
+    selectCategorie(categorie);
 
 		} else if(cat == 2) {
-      memset(produse, 0, sizeof(produse));
-      memset(cost, 0, sizeof(cost));
-      n = 0;
-      m = 0;
-      sqlite3 *db;
-      char *err_msg = 0;
-      sqlite3_stmt *res;
-      
-      int rc = sqlite3_open("shopper.db", &db);
-      
-      if (rc != SQLITE_OK) {
-        
-        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
-        sqlite3_close(db);
-      }
-      
-      char *sql = "SELECT * FROM Incaltaminte";
-          
-      rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
-      
-      if (rc == SQLITE_OK) {
 
-        printf("s-a facut sql \n");
+      memset(categorie, 0, sizeof(categorie));
+      strcpy(categorie, "Incaltaminte");
+      selectCategorie(categorie);
 
-      } else {
-          
-        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
-      }
-      
-
-      while(sqlite3_step(res) == SQLITE_ROW) {
-
-        // printf("%s: ", sqlite3_column_text(res, 0));
-        // printf("%s ", sqlite3_column_text(res, 0));
-        // printf("%s \n", sqlite3_column_text(res, 1));
-
-        strcpy(produse[n], sqlite3_column_text(res, 0) );
-        strcat(produse[n] , " ");
-        strcat(cost[m] , sqlite3_column_text(res, 1));
-        strcat(cost[m] , "\n");
-
-        n++;
-        m++;
-      } 
 		} else if( cat == 3) {
-      memset(produse, 0, sizeof(produse));
-      memset(cost, 0, sizeof(cost));
-      n = 0;
-      m = 0;
-      sqlite3 *db;
-      char *err_msg = 0;
-      sqlite3_stmt *res;
-      
-      int rc = sqlite3_open("shopper.db", &db);
-      
-      if (rc != SQLITE_OK) {
-        
-        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
-        sqlite3_close(db);
-      }
-      
-      char *sql = "SELECT * FROM Mancare";
-          
-      rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
-      
-      if (rc == SQLITE_OK) {
 
-        printf("s-a facut sql \n");
+     memset(categorie, 0, sizeof(categorie));
+     strcpy(categorie, "Mancare");
+     selectCategorie(categorie);
 
-      } else {
-          
-        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
-      }
-      
-
-      while(sqlite3_step(res) == SQLITE_ROW) {
-
-        // printf("%s: ", sqlite3_column_text(res, 0));
-        // printf("%s ", sqlite3_column_text(res, 0));
-        // printf("%s \n", sqlite3_column_text(res, 1));
-
-        strcpy(produse[n], sqlite3_column_text(res, 0) );
-        strcat(produse[n] , " ");
-        strcat(cost[m] , sqlite3_column_text(res, 1));
-        strcat(cost[m] , "\n");
-
-        n++;
-        m++;
-      } 
+    } else {
+      printf("Alege un numar valid.");
     }
+
 
     write(tdL.cl, produse, sizeof(produse));
     write(tdL.cl, cost, sizeof(cost));
@@ -364,27 +247,7 @@ void raspunde(void *arg) {
       printf("rezulta incalta: %s", cost[i]);
     }
 
-    // char rezultatIncaltaminte[50];
-    // strcpy(rezultatIncaltaminte, incaltaminte);
-
-    // printf("rezulta incaltaminte: %s", rezultatIncaltaminte[1]);
-    // for( int i = 0; i < 4; i++) {
-    //   printf("rezulta incaltaminte: %d", rezultatIncaltaminte[i]);
-    // }
-   
-    // fscanf(fis3, "%d", &n);
-    // printf("N = %d\n", n);
-    // for(int i = 0; i < n; i++){
-    //     fscanf(fis3, "%s %s",p[i], c[i]);
-    // }
-    // fclose(fis3);
-
-		// Afisam produsele (p, c vectorii care contin produsele)
-    // write(tdL.cl, &n, 4);
-    // printf("\n");
-      printf("\n");
-    // write(tdL.cl, c, 2500);
-    // printf("\n");
+    printf("\n");
     read(tdL.cl, &g, 4);
   }
 }
@@ -484,5 +347,55 @@ void insertUser( char* nume , char* parola ){
    
 }
 
+void selectCategorie(char categorie[]) {
+    memset(produse, 0, sizeof(produse));
+    memset(cost, 0, sizeof(cost));
+    n = 0;
+    m = 0;
+    sqlite3 *db;
+    char *err_msg = 0;
+    sqlite3_stmt *res;
+    
 
+    int rc = sqlite3_open("shopper.db", &db);
+    
+    if (rc != SQLITE_OK) {
+      
+      fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+      sqlite3_close(db);
+    }
+    
+    char sql[200] = "SELECT * FROM ";
+    strcat(sql , categorie );
+    strcat(sql , ";" );
+
+    printf(" \nSQL%s \n", sql );
+
+    rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
+    
+    if (rc == SQLITE_OK) {
+
+      printf("s-a facut sql \n");
+
+    } else {
+        
+      fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+    }
+    
+
+    while(sqlite3_step(res) == SQLITE_ROW) {
+
+      // printf("%s: ", sqlite3_column_text(res, 0));
+      // printf("%s ", sqlite3_column_text(res, 0));
+      // printf("%s \n", sqlite3_column_text(res, 1));
+
+      strcpy(produse[n], sqlite3_column_text(res, 0) );
+      strcat(produse[n] , " ");
+      strcat(cost[m] , sqlite3_column_text(res, 1));
+      strcat(cost[m] , "\n");
+
+      n++;
+      m++;
+    } 
+}
 
