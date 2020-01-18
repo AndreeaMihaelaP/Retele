@@ -8,6 +8,8 @@
 #include <netdb.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <ctype.h>
+
 
 // codul de eroare returnat de anumite apeluri
 extern int errno;
@@ -48,148 +50,166 @@ int main (int argc, char *argv[]) {
   check(connect (sd, (struct sockaddr *) &server,sizeof (struct sockaddr)), "[client]Eroare la connect().\n" );
 
 
-  // Shopper
+
   int operatie;
-  int ok;
+  int succes;
+  int lungimeNume;
+  int lungimeParola;
+  int gen;
+  int sumaTotala = 0;
+  int sumaCategorii[5];
+  int continua = 1;
+  int sumaProduse = 0;
+  int loop = 1;
+  int numarProduse = 0;
+  int lungimeCategorii;
+  char categorii[500];
+  char categorie[30];
+  char produse[200][200];
+  char cost[200][200];
   char nume[50], parola[50];
 
-  printf("\n \
-     Bine ati venit la Shopper \n \
-  >---------------------------------< \n \
-  Alegeti una din varianta alegand o cifra\n\n\
-  1.Login\n \
-  2.Inregistrare \n");
+  printf("\n \t \t Bine ati venit la Shopper! \n \
+  \t >-------------------------------------< \n \
+  Pentru a putea continua selectati una din cele doua variante.\n\n\
+  1. Logare \n\n\
+  2. Inregistrare\n\n");
 
-  // Login
+  printf(" Operatia: "); 
   scanf("%d", &operatie);
 
-  if (operatie == 1) {
+  if (operatie != 1 && operatie !=2 ) {
 
-    write(sd, &operatie, 4);
-    printf("User :"); scanf("%s", nume);
-    printf("Parola :"); scanf("%s", parola);
-    //printf("%s %s", nume, parola);
-    int len1 = strlen(nume);
-    int len2 = strlen(parola);
-    //printf("%d %d", len1, len2);
-    fflush(stdout);
-    write(sd, &len1, 4);
-    write(sd, nume, len1);
-    write(sd, &len2, 4);
-    write(sd, parola, len2);
+    printf("\n Ups.Selecteaza operatia 1 pentru logare sau 2 pentru inregistrare.\n");
+    printf(" \n Operatia: ");
+    scanf("%d", &operatie);
 
-    int ok;
-    read(sd, &ok, 4);
-
-    if (ok == 1) {
-      printf("Logat cu succes.\n\n\n");
-      printf("\n");
-    } else {
-      printf("Mai incearca.");
-      printf("\n");
-      return(0);
-    }
   }
 
-  if (operatie == 2) {
-    write(sd, &operatie, 4);
-    printf("User :"); scanf("%s", nume);
-    printf("Parola :"); scanf("%s", parola);
-    int len1 = strlen(nume);
-    int len2 = strlen(parola);
-    fflush(stdout);
-    write(sd, &len1, 4);
-    write(sd, nume, len1);
-    write(sd, &len2, 4);
-    write(sd, parola, len2);
-    int ok;
-    read(sd, &ok, 4);
+  switch (operatie) {
+    case 1:
 
-    if (ok == 0){
-      printf("Inregistrat cu succes.\n\n\n");
-      printf("\n");
-    } else {
-      printf("Account folosit..");
-      printf("\n");
-      return(0);
-    }
+      write(sd, &operatie, sizeof(int));
+
+      printf("\n Utilizator: "); 
+      scanf("%s", nume);
+
+      printf("\n Parola: ");
+      scanf("%s", parola);
+
+      lungimeNume = strlen(nume);
+      write(sd, &lungimeNume, sizeof(int));
+      write(sd, nume, lungimeNume);
+
+      lungimeParola = strlen(parola);
+      write(sd, &lungimeParola, sizeof(int));
+      write(sd, parola, lungimeParola);
+
+      read(sd, &succes, sizeof(int));
+
+      if (succes == 1) {
+        printf("\n Te-ai logat cu succes. \n\n");
+      } else {
+        printf("\n Ne pare rau. Mai incearca.\n");
+        return 0;
+      }
+      break;
+
+    case 2:
+
+      write(sd, &operatie, sizeof(int));
+
+      printf("\n Utilizator: "); 
+      scanf("%s", nume);
+
+      printf("\n Parola: "); 
+      scanf("%s", parola);
+
+     
+      lungimeNume = strlen(nume);
+      write(sd, &lungimeNume, sizeof(int));
+      write(sd, nume, lungimeNume);
+
+      lungimeParola = strlen(parola);
+      write(sd, &lungimeParola, sizeof(int));
+      write(sd, parola, lungimeParola);
+
+      read(sd, &succes, sizeof(int));
+
+      if (succes == 0) {
+        printf("\n Te-ai inregistrat cu succes. \n\n");
+      } else {
+        printf("\n Exista deja contul in baza de date. \n");
+        return 0;
+      }
+      break;
+
+    default:
+      break;
   }
-    int totSum = 0;
-    int vector[5];
-    int g = 1;
 
-    while(g) {
-      g = 0;
-      char categorii[5000];
-      memset(categorii, 0, sizeof(categorii));
-      int len3;
+  while (continua) {
 
-      read(sd, &len3, 4);
-      read(sd, categorii, len3);
+    memset(categorii, 0, sizeof(categorii));
+    continua = 0;
 
-      printf("%s",categorii);
-      printf("\n\n");
+    read(sd, &lungimeCategorii, sizeof(int));
+    read(sd, categorii, lungimeCategorii);
 
-      int cat;
-      printf("Alege categoria: "); scanf("%d", &cat);
+    printf("Categoriile: \n %s \n\n", categorii);
 
-      // Trimitem la server categoria
-      write(sd, &cat, 4);
+    printf("Alege categoria: ");
+    scanf("%d", &gen);
+    write(sd, &gen, sizeof(int));
 
-      int n;
-      // char c[50][50];
-      // char p[50][50];
-      char produse[200][200];
-      
-       char cost[200][200];
-      // Serverul ne intoarce numarul de categorii
-      // read(sd, &n, 4);
+    read(sd, produse, sizeof(produse));
+    read(sd, cost, sizeof(cost));
 
-      // Serverul intoarce vectorii cu produsele
-      read(sd, produse, sizeof(produse));
-      read(sd, cost, sizeof(cost));
+    printf("\n Produse   Cost(Lei) \n\n");
+    for(int i = 0; i < 4; i++){
+        printf("%d. %s  %s\n", i + 1, produse[i], cost[i]);
+    }
+
+    memset(sumaCategorii, 0, sizeof(sumaCategorii));
 
 
-      // read(sd, s, 2500);
-      // read(sd, c, 2500);
-      // printf("N = %d\n\n", n);
+    while(loop) {
 
-      // Iteram peste produse
-      for(int i = 0; i < 4; i++){
-          printf("%d. %s  %sRONI \n", i + 1, produse[i], cost[i]);
+      printf(" Selecteaza ce produs vrei. Apasa 0 cand termini. \n");
+      printf("\n Numar produs: ");
+      scanf("%d", &loop);
+
+      if (loop > 0 && loop < 5) {
+
+        sumaCategorii[numarProduse++] = loop;
+        printf("\n A fost adaugat produsul %d in cos. \n\n", loop);
+
+      } else {
+        printf("\n Produsul nu exista in cos. \n\n");
       }
+    }
 
-      // Golim vectorul
-      memset(vector, 0, sizeof(vector));
+    for( int i = 0; i < numarProduse; i++) {
+      printf(" Produsele pe care le-ai ales: %d \n", sumaCategorii[i] );
+    }
 
-      int x = 1;
 
-      while(x) {
-         printf("Selecteaza item-ul pe care vrei sa il adaugi in cos. Tastezi 0 cand termini. \n");
-         scanf("%d", &x);
-         vector[x]++;
-         // verifica daca chiar exista pana la opresteeee-l
-         printf("A fost adaugat item-ul %d in cos. \n\n", x);
-      }
-      printf("\n----------------------------------------------\n");
-      int sum = 0;
+    for(int i = 0; i < numarProduse; i++) {
+        sumaProduse = sumaProduse  + atoi(cost[sumaCategorii[i] - 1]);
+    }
 
-      for(int i = 1; i < 50; i++){
-        if (vector[i]) {
-            sum += atoi(cost[i-1]) * vector[i];
-            printf("Elementul %d este de %d ori in cos.\n\n", i, vector[i]);
-        }
-      }
-      printf("-----------------------------------------------");
-      printf("\nSuma  produselor alese din categoria asta = %d RONI\n\n\n", sum);
-      totSum += sum;
-      printf("0.Checkout.\n");
-      printf("1.Alege produse din alta categorie.\n");
-      scanf("%d", &g);
-      write(sd, &g, 4);
-   }
+    printf("\nSuma totala din categoria asta = %d LEI\n\n\n", sumaProduse);
+    sumaTotala = sumaTotala + sumaProduse;
+    
+    printf("Daca vrei sa alegi produse din alta categorie apasa 1. \n \
+    Daca vrei sa iesi apasa 0. \n");
 
-    printf("Total spre plata : %d\n", totSum);
+    printf("\n Operatie: ");
+    scanf("%d", &continua);
+    write(sd, &continua, sizeof(int));
+ }
+
+  printf("Suma produselor din toate categoriile: %d\n", sumaTotala);
 }
 
 int check(int exp, const char *msg){
