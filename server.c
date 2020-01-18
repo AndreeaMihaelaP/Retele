@@ -123,7 +123,6 @@ void raspunde(void *arg) {
   int lungimeParola;
   int operatie;
   int succes;
-  int continua = 1;
   char nume[50], parola[50];
 
 	// Thread
@@ -180,7 +179,7 @@ void raspunde(void *arg) {
       break;
   }
 
-
+  int continua = 1;
   while (continua) {
 
     char categorii[500];

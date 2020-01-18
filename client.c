@@ -58,10 +58,6 @@ int main (int argc, char *argv[]) {
   int gen;
   int sumaTotala = 0;
   int sumaCategorii[5];
-  int continua = 1;
-  int sumaProduse = 0;
-  int loop = 1;
-  int numarProduse = 0;
   int lungimeCategorii;
   char categorii[500];
   char categorie[30];
@@ -148,6 +144,7 @@ int main (int argc, char *argv[]) {
       break;
   }
 
+  int continua = 1;
   while (continua) {
 
     memset(categorii, 0, sizeof(categorii));
@@ -172,7 +169,9 @@ int main (int argc, char *argv[]) {
 
     memset(sumaCategorii, 0, sizeof(sumaCategorii));
 
-
+    int loop = 1;
+    int numarProduse = 0;
+    int sumaProduse = 0;
     while(loop) {
 
       printf(" Selecteaza ce produs vrei. Apasa 0 cand termini. \n");
@@ -189,9 +188,9 @@ int main (int argc, char *argv[]) {
       }
     }
 
-    for( int i = 0; i < numarProduse; i++) {
-      printf(" Produsele pe care le-ai ales: %d \n", sumaCategorii[i] );
-    }
+    // for( int i = 0; i < numarProduse; i++) {
+    //   printf(" Produsele pe care le-ai ales: %d \n", sumaCategorii[i] );
+    // }
 
 
     for(int i = 0; i < numarProduse; i++) {
