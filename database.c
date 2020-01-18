@@ -27,31 +27,31 @@ int main(void) {
     char *sql = "DROP TABLE IF EXISTS Useri;" 
                 "CREATE TABLE Useri(NUME TEXT, PAROLA TEXT);" 
                 "INSERT INTO Useri VALUES('andreea', 'andreea');" 
-                "INSERT INTO Useri VALUES('vali', 'bala');" 
+                "INSERT INTO Useri VALUES('paula', 'paula');" 
                 "INSERT INTO Useri VALUES('cristi', 'cristi');" 
                 "INSERT INTO Useri VALUES('sanda', 'sanda');" ;
 
     char *sqlImbracaminte = "DROP TABLE IF EXISTS Imbracaminte;" 
                 "CREATE TABLE Imbracaminte(IMBRACAMINTE TEXT, PRET TEXT);" 
-                "INSERT INTO Imbracaminte VALUES('hanorac', '80');" 
-                "INSERT INTO Imbracaminte VALUES('pantaloni','90');" 
-                "INSERT INTO Imbracaminte VALUES('rochie', '500');" 
-                "INSERT INTO Imbracaminte VALUES('geaca', '100');" ;           
+                "INSERT INTO Imbracaminte VALUES('Hanorac', '80');" 
+                "INSERT INTO Imbracaminte VALUES('Pantaloni','90');" 
+                "INSERT INTO Imbracaminte VALUES('Rochie', '500');" 
+                "INSERT INTO Imbracaminte VALUES('Geaca', '100');" ;           
 
     char *sqlIncaltaminte = "DROP TABLE IF EXISTS Incaltaminte;" 
                 "CREATE TABLE Incaltaminte(INCALTAMINTE TEXT, PRET TEXT);" 
-                "INSERT INTO Incaltaminte VALUES('sandale', '80');" 
-                "INSERT INTO Incaltaminte VALUES('adidasi','90');" 
-                "INSERT INTO Incaltaminte VALUES('tenisi', '500');" 
-                "INSERT INTO Incaltaminte VALUES('bocanci', '100');" ;    
+                "INSERT INTO Incaltaminte VALUES('Sandale', '80');" 
+                "INSERT INTO Incaltaminte VALUES('Adidasi','90');" 
+                "INSERT INTO Incaltaminte VALUES('Tenisi', '500');" 
+                "INSERT INTO Incaltaminte VALUES('Bocanci', '100');" ;    
 
     
     char *sqlMancare = "DROP TABLE IF EXISTS Mancare;" 
                 "CREATE TABLE Mancare(MANCARE TEXT, PRET TEXT);" 
-                "INSERT INTO Mancare VALUES('banane', '40');" 
-                "INSERT INTO Mancare VALUES('pizza','20');" 
-                "INSERT INTO Mancare VALUES('salata', '15');" 
-                "INSERT INTO Mancare VALUES('mere', '20');" ;                     
+                "INSERT INTO Mancare VALUES('Banane', '40');" 
+                "INSERT INTO Mancare VALUES('Pizza','20');" 
+                "INSERT INTO Mancare VALUES('Salata', '15');" 
+                "INSERT INTO Mancare VALUES('Mere', '20');" ;                     
 
     rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
     rcImbracaminte = sqlite3_exec(db, sqlImbracaminte, 0, 0, &err_msg);
